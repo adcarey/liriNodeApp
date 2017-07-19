@@ -6,16 +6,21 @@ var spotify = new Spotify({
   secret: "371ce50a45a24d0db782f307ccb67be5"
 });
 var param =  require("./keys.js");
-var client = param.twitterKeys;
+var client = new Twitter(param.twitterKeys);
 
 function liriBot(){
 	if(process.argv[2] === "my-tweets"){
-	console.log(param.twitterKeys);
-	var params = {liriForClass: 'nodejs'};
+	var params = {liriForClass: 'nodejs', count: 20};
 	client.get('statuses/user_timeline', params, function(error, tweets, response) {
  	if (!error) {
-    console.log(tweets);
+ 		console.log("My Latest Tweets:")
+ 		for(var i = 0; i <tweets.length; i++){
+ 			if(i >= 0 && i < tweets.length){
+    	console.log(tweets[i].text);
   	}
+  	}
+  	}
+  	//console.log(tweets);
 	});
 	} 
 	else if(process.argv[2] === "spotify-this-song"){
@@ -29,7 +34,7 @@ function liriBot(){
 				song += process.argv[i];
 			} 
 		} 
-		console.log(song);
+		//console.log(song);
 		spotify.search({ type: 'track', query: song, limit: 1 }, function(err, data) {
   		if (err) {
     	return console.log('Error occurred: ' + err);
@@ -43,33 +48,38 @@ function liriBot(){
 
 
 	}
-else if(process.argv[2] === "movie-this"){
-	movieName = "";
-	for (var i = 3; i < process.argv.length; i++) {
-  	if (i > 3 && i < process.argv.length) {
-    	movieName = movieName + "+" + process.argv[i];
- 		 }
-  	else {
-    	movieName += process.argv[i];
-  }
+	else if(process.argv[2] === "movie-this"){
+		movieName = "mr.nobody";
+		for (var i = 3; i < process.argv.length; i++) {
+	  	if (i > 3 && i < process.argv.length) {
+	  		movieName = "";
+	    	movieName = movieName + "+" + process.argv[i];
+	 	}  else {
+	 		movieName = ""
+	    	movieName += process.argv[i];
+	    } 
+		}
+	var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece";
+		console.log(queryUrl);
+		request(queryUrl, function(error, response, body) {
+		if (movieName === "mr.nobody"){
+			console.log("If you haven't watched 'Mr. Nobody' then you should: http://www.imdb.com/title/tt0485947/");
+			console.log("It's on Netflix!");
+		}
+	  // If the request is successful
+	  	if (!error && response.statusCode === 200) {
+	    // Parse the body of the site and recover just the imdbRating
+	    // (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
+	    console.log("Title: " + JSON.parse(body).Title);
+	    console.log("Release Year: " + JSON.parse(body).Year);
+	    console.log("IMDB: " + JSON.parse(body).imdbRating);
+	    console.log("Country Produced: " + JSON.parse(body).Country);
+	   	console.log("Language: " + JSON.parse(body).Language);
+	   	console.log("Plot: " + JSON.parse(body).Plot);
+	   	console.log("Actors: " + JSON.parse(body).Actors);
+	   	console.log("Website: " + JSON.parse(body).Website);
+	  }
+	});
 	}
-var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece";
-	console.log(queryUrl);
-	request(queryUrl, function(error, response, body) {
-  // If the request is successful
-  	if (!error && response.statusCode === 200) {
-    // Parse the body of the site and recover just the imdbRating
-    // (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
-    console.log("Title: " + JSON.parse(body).Title);
-    console.log("Release Year: " + JSON.parse(body).Year);
-    console.log("IMDB: " + JSON.parse(body).imdbRating);
-    console.log("Country Produced: " + JSON.parse(body).Country);
-   	console.log("Language: " + JSON.parse(body).Language);
-   	console.log("Plot: " + JSON.parse(body).Plot);
-   	console.log("Actors: " + JSON.parse(body).Actors);
-   	console.log("Website: " + JSON.parse(body).Website);
-  }
-});
-}
-}
+	}
 liriBot()
