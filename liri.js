@@ -7,6 +7,7 @@ var spotify = new Spotify({
 });
 var param =  require("./keys.js");
 var client = new Twitter(param.twitterKeys);
+var fs = require("fs");
 
 function liriBot(){
 	if(process.argv[2] === "my-tweets"){
@@ -17,6 +18,10 @@ function liriBot(){
  		for(var i = 0; i <tweets.length; i++){
  			if(i >= 0 && i < tweets.length){
     	console.log(tweets[i].text);
+    	log = [
+    	tweets[i].text
+    	]
+    	append();
   	}
   	}
   	}
@@ -44,6 +49,14 @@ function liriBot(){
 		console.log("The Song is: " + data.tracks.items[0].name);
 		console.log("Listen to the preview: " + data.tracks.items[0].preview_url);
 		console.log("The Album is " + data.tracks.items[0].album.name)
+
+		log = [
+			"The Artist is: " + data.tracks.items[0].artists[0].name,
+			"The Song is: " + data.tracks.items[0].name,
+			"Listen to the preview: " + data.tracks.items[0].preview_url,
+			"The Album is " + data.tracks.items[0].album.name
+			]
+			append();
 	});
 
 
@@ -78,8 +91,65 @@ function liriBot(){
 	   	console.log("Plot: " + JSON.parse(body).Plot);
 	   	console.log("Actors: " + JSON.parse(body).Actors);
 	   	console.log("Website: " + JSON.parse(body).Website);
+
+	   	log = [
+	   	"Title: " + JSON.parse(body).Title,
+	    "Release Year: " + JSON.parse(body).Year,
+	    "IMDB: " + JSON.parse(body).imdbRating,
+	    "Country Produced: " + JSON.parse(body).Country,
+	   	"Language: " + JSON.parse(body).Language,
+	   	"Plot: " + JSON.parse(body).Plot,
+	   	"Actors: " + JSON.parse(body).Actors,
+	   	"Website: " + JSON.parse(body).Website
+	   	]
+	   	append();
 	  }
 	});
+	} else if(process.argv[2] === "do-what-it-says"){
+		fs.readFile("random.txt", "utf8", function(err, data){
+		if (err){
+			return console.log(err)
+	} 	else { 
+			process.argv[2] = data
+			console.log(process.argv[2])
+			song = data.replace("spotify-this-song", "")
+			spotify.search({ type: 'track', query: song, limit: 1 }, function(err, data) {
+  			if (err) {
+    		return console.log('Error occurred: ' + err);
+  			}
+  			
+			console.log("The Artist is: " + data.tracks.items[0].artists[0].name);
+			console.log("The Song is: " + data.tracks.items[0].name);
+			console.log("Listen to the preview: " + data.tracks.items[0].preview_url);
+			console.log("The Album is " + data.tracks.items[0].album.name);
+
+			log = [
+			"The Artist is: " + data.tracks.items[0].artists[0].name,
+			"The Song is: " + data.tracks.items[0].name,
+			"Listen to the preview: " + data.tracks.items[0].preview_url,
+			"The Album is " + data.tracks.items[0].album.name
+			]
+		append();
+	});
 	}
+
+	});
 	}
-liriBot()
+}
+function append(){
+fs.appendFile("log.txt", log, function(err) {
+  		// If an error was experienced we say it.
+  			if (err) {
+    		console.log(err);
+ 	 		}
+  // If no error is experienced, we'll log the phrase "Content Added" to our node console.
+  			else {
+    		console.log("content added");
+  }
+});
+}
+
+
+liriBot();
+
+
