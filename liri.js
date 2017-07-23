@@ -8,6 +8,8 @@ var spotify = new Spotify({
 var param =  require("./keys.js");
 var client = new Twitter(param.twitterKeys);
 var fs = require("fs");
+var song = "";
+var movieName = "";
 
 function liriBot(){
 	if(process.argv[2] === "my-tweets"){
@@ -29,17 +31,17 @@ function liriBot(){
 	});
 	} 
 	else if(process.argv[2] === "spotify-this-song"){
-		 song = "The+Sign+Ace";
+		song = "The+Sign+Ace";
 		for (var i = 3; i < process.argv.length; i++){
 			if(i > 3 && i < process.argv.length){
-				song = "";
+				// song = "";
 				song = song + "+" + process.argv[i];
-		} else {
+		} else{
 				song = "";
 				song += process.argv[i];
 			} 
 		} 
-		//console.log(song);
+		console.log(song);
 		spotify.search({ type: 'track', query: song, limit: 1 }, function(err, data) {
   		if (err) {
     	return console.log('Error occurred: ' + err);
@@ -65,12 +67,13 @@ function liriBot(){
 		movieName = "mr.nobody";
 		for (var i = 3; i < process.argv.length; i++) {
 	  	if (i > 3 && i < process.argv.length) {
-	  		movieName = "";
+	  		// movieName = "";
 	    	movieName = movieName + "+" + process.argv[i];
 	 	}  else {
 	 		movieName = ""
 	    	movieName += process.argv[i];
 	    } 
+	    console.log(movieName);
 		}
 	var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece";
 		console.log(queryUrl);
